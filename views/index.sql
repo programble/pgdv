@@ -10,3 +10,17 @@ CREATE OR REPLACE VIEW pgdv.index_totals AS
     AND pg_namespace.nspname !~ '^pg_toast';
 
 COMMENT ON VIEW pgdv.index_totals IS 'Shows the total number and size of all indexes.';
+
+CREATE OR REPLACE VIEW pgdv.index_size AS
+  SELECT
+    pg_class.relname AS name,
+    pg_class.relpages AS pages,
+    pg_size_pretty(pg_class.relpages::bigint * 8192) AS size
+  FROM pg_class
+  LEFT JOIN pg_namespace ON (pg_namespace.oid = pg_class.relnamespace)
+  WHERE pg_class.relkind = 'i'
+    AND pg_namespace.nspname NOT IN ('pg_catalog', 'information_schema')
+    AND pg_namespace.nspname !~ '^pg_toast'
+  ORDER BY pg_class.relpages DESC;
+
+COMMENT ON VIEW pgdv.index_size IS 'Shows the size of each index.';
