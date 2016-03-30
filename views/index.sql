@@ -58,3 +58,14 @@ CREATE OR REPLACE VIEW pgdv.index_cache_hits AS
   ORDER BY percent_cache_hit DESC NULLS LAST;
 
 COMMENT ON VIEW pgdv.index_cache_hits IS 'index cache hits / misses';
+
+CREATE OR REPLACE VIEW pgdv.index_cache_hits_total AS
+  SELECT
+    sum(cache_misses) AS cache_misses,
+    sum(cache_hits) AS cache_hits,
+    (
+      sum(cache_hits)::float / sum(cache_misses + cache_hits) * 100
+    )::numeric(5, 2) AS percent_cache_hit
+  FROM pgdv.index_cache_hits;
+
+COMMENT ON VIEW pgdv.index_cache_hits_total IS 'total index cache hits / misses';
