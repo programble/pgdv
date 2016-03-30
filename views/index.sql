@@ -56,3 +56,5 @@ CREATE OR REPLACE VIEW pgdv.index_cache_hits AS
     )::numeric(5, 2) AS percent_cache_hit
   FROM pg_statio_user_indexes
   ORDER BY percent_cache_hit DESC NULLS LAST;
+
+COMMENT ON VIEW pgdv.index_cache_hits IS 'index cache hits / misses';
