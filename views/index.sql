@@ -23,6 +23,7 @@ COMMENT ON VIEW pgdv.index_sizes_total IS 'total size of all indexes';
 
 CREATE OR REPLACE VIEW pgdv.index_usage AS
   SELECT
+    schemaname AS schema,
     relname AS table,
     n_live_tup AS rows,
     seq_scan AS seq_scans,
