@@ -70,3 +70,19 @@ CREATE OR REPLACE VIEW pgdv.index_cache_hits_total AS
   FROM pgdv.index_cache_hits;
 
 COMMENT ON VIEW pgdv.index_cache_hits_total IS 'total index cache hits / misses';
+
+CREATE OR REPLACE VIEW pgdv.index_scan_size_ratios AS
+  SELECT
+    pg_stat_user_indexes.indexrelname AS index,
+    pg_relation_size(pg_index.indexrelid) AS size,
+    pg_size_pretty(pg_relation_size(pg_index.indexrelid)) AS pretty_size,
+    pg_stat_user_indexes.idx_scan AS index_scans,
+    (
+      pg_relation_size(pg_index.indexrelid) / nullif(pg_stat_user_indexes.idx_scan, 0)
+    ) AS size_scan_ratio
+  FROM pg_stat_user_indexes, pg_index
+  WHERE pg_index.indexrelid = pg_stat_user_indexes.indexrelid
+    AND NOT pg_index.indisunique
+  ORDER BY size_scan_ratio DESC NULLS FIRST, size DESC;
+
+COMMENT ON VIEW pgdv.index_scan_size_ratios IS 'index scan / size ratios';
