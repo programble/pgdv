@@ -22,6 +22,16 @@ CREATE OR REPLACE VIEW pgdv.table_sizes_total AS
 
 COMMENT ON VIEW pgdv.table_sizes_total IS 'total size of all tables';
 
+CREATE OR REPLACE VIEW pgdv.table_rows AS
+  SELECT
+    schemaname AS schema,
+    relname AS table,
+    n_live_tup AS rows
+  FROM pg_stat_user_tables
+  ORDER BY rows DESC;
+
+COMMENT ON VIEW pgdv.table_rows IS 'number of rows in each table';
+
 CREATE OR REPLACE VIEW pgdv.table_cache_hits AS
   SELECT
     schemaname AS schema,
