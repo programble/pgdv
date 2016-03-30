@@ -1,22 +1,22 @@
 CREATE OR REPLACE VIEW pgdv.index_sizes AS
   SELECT
     pg_class.relname AS index,
-    pg_class.relpages AS pages,
-    pg_size_pretty(pg_class.relpages::bigint * 8192) AS size
+    pg_relation_size(pg_class.oid) AS size,
+    pg_size_pretty(pg_relation_size(pg_class.oid)) AS pretty_size
   FROM pg_class, pg_namespace
   WHERE pg_namespace.oid = pg_class.relnamespace
     AND pg_namespace.nspname NOT IN ('pg_catalog', 'information_schema')
     AND pg_namespace.nspname !~ '^pg_toast'
     AND pg_class.relkind = 'i'
-  ORDER BY pages DESC;
+  ORDER BY size DESC;
 
 COMMENT ON VIEW pgdv.index_sizes IS 'size of each index';
 
 CREATE OR REPLACE VIEW pgdv.index_sizes_total AS
   SELECT
     count(*) AS count,
-    sum(pages) AS pages,
-    pg_size_pretty(sum(pages::bigint * 8192)) AS size
+    sum(size) AS size,
+    pg_size_pretty(sum(size)) AS pretty_size
   FROM pgdv.index_sizes;
 
 COMMENT ON VIEW pgdv.index_sizes_total IS 'total size of all indexes';
