@@ -38,3 +38,12 @@ CREATE OR REPLACE VIEW pgdv.index_usage AS
   ORDER BY rows DESC;
 
 COMMENT ON VIEW pgdv.index_usage IS 'index / seq scan usage for each table';
+
+CREATE OR REPLACE VIEW pgdv.index_cache_hits AS
+  SELECT
+    indexrelname AS index,
+    idx_blks_read AS cache_misses,
+    idx_blks_hit AS cache_hits,
+    (idx_blks_hit::float / nullif(idx_blks_read + idx_blks_hit, 0) * 100)::numeric(5, 2) AS percent_cache_hit
+  FROM pg_statio_user_indexes
+  ORDER BY percent_cache_hit DESC NULLS LAST;
