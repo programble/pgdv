@@ -27,7 +27,9 @@ CREATE OR REPLACE VIEW pgdv.index_usage AS
     n_live_tup AS rows,
     seq_scan AS seq_scans,
     idx_scan AS index_scans,
-    (nullif(idx_scan, 0)::float / (seq_scan + idx_scan) * 100)::numeric(5, 2) AS percent_index_scan
+    (
+      nullif(idx_scan, 0)::float / (seq_scan + idx_scan) * 100
+    )::numeric(5, 2) AS percent_index_scan
   FROM pg_stat_user_tables
   ORDER BY rows DESC;
 
@@ -37,7 +39,9 @@ CREATE OR REPLACE VIEW pgdv.index_usage_total AS
   SELECT
     sum(seq_scans) AS seq_scans,
     sum(index_scans) AS index_scans,
-    (sum(index_scans)::float / sum(seq_scans + index_scans) * 100)::numeric(5, 2) AS percent_index_scan
+    (
+      sum(index_scans)::float / sum(seq_scans + index_scans) * 100
+    )::numeric(5, 2) AS percent_index_scan
   FROM pgdv.index_usage;
 
 COMMENT ON VIEW pgdv.index_usage_total IS 'total index / seq scan usage';
@@ -47,6 +51,8 @@ CREATE OR REPLACE VIEW pgdv.index_cache_hits AS
     indexrelname AS index,
     idx_blks_read AS cache_misses,
     idx_blks_hit AS cache_hits,
-    (idx_blks_hit::float / nullif(idx_blks_read + idx_blks_hit, 0) * 100)::numeric(5, 2) AS percent_cache_hit
+    (
+      idx_blks_hit::float / nullif(idx_blks_read + idx_blks_hit, 0) * 100
+    )::numeric(5, 2) AS percent_cache_hit
   FROM pg_statio_user_indexes
   ORDER BY percent_cache_hit DESC NULLS LAST;
