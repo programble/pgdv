@@ -1,31 +1,25 @@
-CREATE OR REPLACE VIEW pgdv.indexes AS
-  SELECT pg_class.*
+CREATE OR REPLACE VIEW pgdv.index_sizes AS
+  SELECT
+    pg_class.relname AS index,
+    pg_class.relpages AS pages,
+    pg_size_pretty(pg_class.relpages::bigint * 8192) AS size
   FROM pg_class, pg_namespace
   WHERE pg_namespace.oid = pg_class.relnamespace
     AND pg_namespace.nspname NOT IN ('pg_catalog', 'information_schema')
     AND pg_namespace.nspname !~ '^pg_toast'
-    AND pg_class.relkind = 'i';
-
-COMMENT ON VIEW pgdv.indexes IS 'user indexes';
-
-CREATE OR REPLACE VIEW pgdv.index_totals AS
-  SELECT
-    count(*) AS count,
-    sum(relpages) AS pages,
-    pg_size_pretty(sum(relpages::bigint * 8192)) AS size
-  FROM pgdv.indexes;
-
-COMMENT ON VIEW pgdv.index_totals IS 'total number and size of all indexes';
-
-CREATE OR REPLACE VIEW pgdv.index_sizes AS
-  SELECT
-    relname AS index,
-    relpages AS pages,
-    pg_size_pretty(relpages::bigint * 8192) AS size
-  FROM pgdv.indexes
-  ORDER BY relpages DESC;
+    AND pg_class.relkind = 'i'
+  ORDER BY pages DESC;
 
 COMMENT ON VIEW pgdv.index_sizes IS 'size of each index';
+
+CREATE OR REPLACE VIEW pgdv.index_sizes_total AS
+  SELECT
+    count(*) AS count,
+    sum(pages) AS pages,
+    pg_size_pretty(sum(pages::bigint * 8192)) AS size
+  FROM pgdv.index_sizes;
+
+COMMENT ON VIEW pgdv.index_sizes_total IS 'total size of all indexes';
 
 CREATE OR REPLACE VIEW pgdv.index_usage AS
   SELECT
@@ -38,6 +32,15 @@ CREATE OR REPLACE VIEW pgdv.index_usage AS
   ORDER BY rows DESC;
 
 COMMENT ON VIEW pgdv.index_usage IS 'index / seq scan usage for each table';
+
+CREATE OR REPLACE VIEW pgdv.index_usage_total AS
+  SELECT
+    sum(seq_scans) AS seq_scans,
+    sum(index_scans) AS index_scans,
+    (sum(index_scans)::float / sum(seq_scans + index_scans) * 100)::numeric(5, 2) AS percent_index_scan
+  FROM pgdv.index_usage;
+
+COMMENT ON VIEW pgdv.index_usage_total IS 'total index / seq scan usage';
 
 CREATE OR REPLACE VIEW pgdv.index_cache_hits AS
   SELECT
