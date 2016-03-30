@@ -32,6 +32,14 @@ CREATE OR REPLACE VIEW pgdv.table_rows AS
 
 COMMENT ON VIEW pgdv.table_rows IS 'number of rows in each table';
 
+CREATE OR REPLACE VIEW pgdv.table_rows_total AS
+  SELECT
+    count(*) AS count,
+    sum(rows) AS rows
+  FROM pgdv.table_rows;
+
+COMMENT ON VIEW pgdv.table_rows_total IS 'total number of rows in all tables';
+
 CREATE OR REPLACE VIEW pgdv.table_cache_hits AS
   SELECT
     schemaname AS schema,
