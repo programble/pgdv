@@ -21,3 +21,17 @@ CREATE OR REPLACE VIEW pgdv.table_sizes_total AS
   FROM pgdv.table_sizes;
 
 COMMENT ON VIEW pgdv.table_sizes_total IS 'total size of all tables';
+
+CREATE OR REPLACE VIEW pgdv.table_cache_hits AS
+  SELECT
+    schemaname AS schema,
+    relname AS table,
+    heap_blks_read AS cache_misses,
+    heap_blks_hit AS cache_hits,
+    (
+      heap_blks_hit::float / nullif(heap_blks_read + heap_blks_hit, 0) * 100
+    )::numeric(5, 2) AS percent_cache_hit
+  FROM pg_statio_user_tables
+  ORDER BY percent_cache_hit DESC NULLS LAST;
+
+COMMENT ON VIEW pgdv.table_cache_hits IS 'table cache hits / misses';
