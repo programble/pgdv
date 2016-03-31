@@ -59,3 +59,15 @@ CREATE OR REPLACE VIEW pgdv.table_cache_hits_total AS
   FROM pgdv.table_cache_hits;
 
 COMMENT ON VIEW pgdv.table_cache_hits_total IS 'total table cache hits / misses';
+
+CREATE OR REPLACE VIEW pgdv.table_vacuums AS
+  SELECT
+    schemaname AS schema,
+    relname AS table,
+    n_dead_tup AS dead_rows,
+    last_vacuum,
+    last_autovacuum
+  FROM pg_stat_user_tables
+  ORDER BY n_dead_tup DESC;
+
+COMMENT ON VIEW pgdv.table_vacuums IS 'table vacuum times';
