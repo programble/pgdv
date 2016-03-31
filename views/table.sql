@@ -28,8 +28,8 @@ CREATE OR REPLACE VIEW pgdv.table_seq_scans AS
   SELECT
     schemaname AS schema,
     relname AS table,
-    n_live_tup AS rows,
-    seq_scan AS seq_scans
+    seq_scan AS seq_scans,
+    seq_tup_read AS seq_scan_rows
   FROM pg_stat_user_tables
   ORDER BY seq_scans DESC;
 
