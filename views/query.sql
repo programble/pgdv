@@ -60,3 +60,16 @@ CREATE OR REPLACE VIEW pgdv.query_calls AS
   ORDER BY calls DESC;
 
 COMMENT ON VIEW pgdv.query_calls IS 'query calls and total time';
+
+CREATE OR REPLACE VIEW pgdv.query_times AS
+  SELECT
+    min_time * interval '1 millisecond' AS min_time,
+    max_time * interval '1 millisecond' AS max_time,
+    total_time * interval '1 millisecond' AS total_time,
+    calls,
+    mean_time * interval '1 millisecond' AS mean_time,
+    query
+  FROM pg_stat_statements
+  ORDER BY mean_time DESC;
+
+COMMENT ON VIEW pgdv.query_times IS 'query times';
