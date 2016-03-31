@@ -33,4 +33,4 @@ CREATE OR REPLACE VIEW pgdv.mandelbrot AS
   GROUP BY iy
   ORDER BY iy;
 
-COMMENT ON pgdv.mandelbrot IS 'the Mandelbrot set';
+COMMENT ON VIEW pgdv.mandelbrot IS 'the Mandelbrot set';
