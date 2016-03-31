@@ -48,3 +48,15 @@ CREATE OR REPLACE VIEW pgdv.query_blocks AS
   ORDER BY blocked_duration DESC;
 
 COMMENT ON VIEW pgdv.query_blocks IS 'blocking / blocked queries';
+
+CREATE OR REPLACE VIEW pgdv.query_calls AS
+  SELECT
+    calls,
+    total_time * interval '1 millisecond' AS total_time,
+    (total_time / sum(total_time) OVER () * 100)::numeric(5, 2) AS percent_total_time,
+    query
+  FROM pg_stat_statements
+  WHERE calls > 1
+  ORDER BY calls DESC;
+
+COMMENT ON VIEW pgdv.query_calls IS 'query calls and total time';
