@@ -1,3 +1,18 @@
+CREATE OR REPLACE VIEW pgdv.query_locks AS
+  SELECT
+    pg_locks.pid AS pid,
+    pg_locks.mode AS mode,
+    pg_class.relname AS relation,
+    pg_locks.granted AS granted,
+    now() - pg_stat_activity.query_start AS query_duration,
+    pg_stat_activity.query AS query
+  FROM pg_locks, pg_class, pg_stat_activity
+  WHERE pg_class.oid = pg_locks.relation
+    AND pg_stat_activity.pid = pg_locks.pid
+    AND pg_locks.mode != 'AccessShareLock';
+
+COMMENT ON VIEW pgdv.query_locks IS 'granted and waiting query locks';
+
 CREATE OR REPLACE VIEW pgdv.query_blocks AS
   SELECT
     blocking_locks.pid AS blocking_pid,
