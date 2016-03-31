@@ -20,4 +20,4 @@ CREATE OR REPLACE VIEW pgdv.query_blocks AS
     AND NOT blocked_locks.granted
   ORDER BY blocked_duration DESC;
 
-COMMENT ON pgdv.query_blocks IS 'blocking / blocked queries';
+COMMENT ON VIEW pgdv.query_blocks IS 'blocking / blocked queries';
