@@ -54,7 +54,7 @@ postgres=# SELECT * FROM pgdv.views;
 The views are dropped by the `drop.sql` file.
 
 ```
-postgres=# \i drop.sql
+postgres=# \i pgdv/drop.sql
 ```
 
 ## License
