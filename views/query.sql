@@ -1,3 +1,15 @@
+CREATE OR REPLACE VIEW pgdv.queries AS
+  SELECT
+    pid,
+    application_name AS application,
+    now() - query_start AS query_duration,
+    query
+  FROM pg_stat_activity
+  WHERE state = 'active'
+  ORDER BY query_duration DESC;
+
+COMMENT ON VIEW pgdv.queries IS 'active queries';
+
 CREATE OR REPLACE VIEW pgdv.query_locks AS
   SELECT
     pg_locks.pid AS pid,
