@@ -1,3 +1,5 @@
+addons:
+  postgresql: "9.4"
 services:
   - postgresql
 script: psql --username postgres --no-psqlrc --file test.sql
