@@ -2,6 +2,7 @@ CREATE OR REPLACE VIEW pgdv.table_sizes AS
   SELECT
     pg_namespace.nspname AS schema,
     pg_class.relname AS table,
+    pg_class.reltuples::numeric AS rows,
     pg_relation_size(pg_class.oid) AS size,
     pg_size_pretty(pg_relation_size(pg_class.oid)) AS pretty_size
   FROM pg_class, pg_namespace
@@ -16,29 +17,12 @@ COMMENT ON VIEW pgdv.table_sizes IS 'size of each table';
 CREATE OR REPLACE VIEW pgdv.table_sizes_total AS
   SELECT
     count(*) AS count,
+    sum(rows) AS rows,
     sum(size) AS size,
     pg_size_pretty(sum(size)) AS pretty_size
   FROM pgdv.table_sizes;
 
 COMMENT ON VIEW pgdv.table_sizes_total IS 'total size of all tables';
-
-CREATE OR REPLACE VIEW pgdv.table_rows AS
-  SELECT
-    schemaname AS schema,
-    relname AS table,
-    n_live_tup AS rows
-  FROM pg_stat_user_tables
-  ORDER BY rows DESC;
-
-COMMENT ON VIEW pgdv.table_rows IS 'number of rows in each table';
-
-CREATE OR REPLACE VIEW pgdv.table_rows_total AS
-  SELECT
-    count(*) AS count,
-    sum(rows) AS rows
-  FROM pgdv.table_rows;
-
-COMMENT ON VIEW pgdv.table_rows_total IS 'total number of rows in all tables';
 
 CREATE OR REPLACE VIEW pgdv.table_seq_scans AS
   SELECT
