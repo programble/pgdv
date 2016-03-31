@@ -40,6 +40,17 @@ CREATE OR REPLACE VIEW pgdv.table_rows_total AS
 
 COMMENT ON VIEW pgdv.table_rows_total IS 'total number of rows in all tables';
 
+CREATE OR REPLACE VIEW pgdv.table_seq_scans AS
+  SELECT
+    schemaname AS schema,
+    relname AS table,
+    n_live_tup AS rows,
+    seq_scan AS seq_scans
+  FROM pg_stat_user_tables
+  ORDER BY seq_scans DESC;
+
+COMMENT ON VIEW pgdv.table_seq_scans IS 'number of sequence scans on each table';
+
 CREATE OR REPLACE VIEW pgdv.table_cache_hits AS
   SELECT
     schemaname AS schema,
